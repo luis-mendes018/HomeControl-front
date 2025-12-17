@@ -10,7 +10,7 @@ export type Field =
   | {
       name: string;
       label: string;
-      type: "text";
+      type: "text" | "number";
       required?: boolean;
       maxLength?: number;
     }
@@ -46,12 +46,14 @@ export default function FormModal({
 
   // Atualiza formData sempre que defaultValues mudar (ex.: edição)
   React.useEffect(() => {
-    if (defaultValues) {
-      setFormData(defaultValues);
-    } else {
-      setFormData({});
+    if (isOpen) {
+      if (defaultValues) {
+        setFormData(defaultValues);
+      } else {
+        setFormData({});
+      }
     }
-  }, [defaultValues]);
+  }, [defaultValues, isOpen]);
 
   function handleChange(name: string, value: any) {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -104,8 +106,8 @@ export default function FormModal({
                 <input
                   type="text"
                   className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  value={formData[field.name] ?? ""}
                   onChange={(e) => handleChange(field.name, e.target.value)}
-                  value={formData[field.name] ?? ""} // <-- valor controlado
                 />
                 {formErrors[field.name] && (
                   <p className="text-red-600 text-sm mt-1">
@@ -129,6 +131,28 @@ export default function FormModal({
                     </option>
                   ))}
                 </select>
+                {formErrors[field.name] && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {formErrors[field.name]}
+                  </p>
+                )}
+              </>
+            )}
+
+            {field.type === "number" && (
+              <>
+                <input
+                  type="number"
+                  min="0"
+                  className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  value={formData[field.name] ?? ""}
+                  onChange={(e) =>
+                    handleChange(
+                      field.name,
+                      e.target.value === "" ? "" : Number(e.target.value)
+                    )
+                  }
+                />
                 {formErrors[field.name] && (
                   <p className="text-red-600 text-sm mt-1">
                     {formErrors[field.name]}

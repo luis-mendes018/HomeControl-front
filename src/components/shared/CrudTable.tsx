@@ -100,7 +100,7 @@ export function CrudTable<T extends { id: string }>({
         </tbody>
       </table>
 
-      {totalPages > 1 && onPageChange && (
+      { onPageChange && (
         <div className="mt-4 flex justify-between items-center text-gray-700 px-8">
           <span>
             Página {pageNumber} de {totalPages} — Total: {totalRecords} registros

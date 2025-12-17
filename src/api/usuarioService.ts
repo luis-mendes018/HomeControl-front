@@ -1,108 +1,70 @@
 import { PaginationResult } from "../types/pagination";
 import { UsuarioCreateDto, UsuarioResponseDto, UsuarioUpdateDto } from "../types/usuario";
+import api from "./axiosConfig";
 
-export const UsuarioService = {
-    /**
-     * Obtém todos os usuários paginados.
-     */
-    async getAllUsuarios(pageNumber: number, pageSize: number): Promise<PaginationResult<UsuarioResponseDto>> {
-        const response = await fetch(`/api/usuarios?pageNumber=${pageNumber}&pageSize=${pageSize}`);
-        if (!response.ok) {
-            throw new Error("Erro ao obter usuários");
-        }
+export const usuarioService = {
+  /**
+   * Obtém todos os usuários paginados.
+   */
+  async getAllUsuarios(pageNumber: number, pageSize: number): Promise<PaginationResult<UsuarioResponseDto>> {
+    const response = await api.get<UsuarioResponseDto[]>("/usuarios", {
+      params: { pageNumber, pageSize },
+    });
 
-        const data = await response.json();
+    return {
+      items: response.data,
+      pageNumber: Number(response.headers["x-pagenumber"]),
+      pageSize: Number(response.headers["x-pagesize"]),
+      totalPages: Number(response.headers["x-totalpages"]),
+      totalRecords: Number(response.headers["x-totalrecords"]),
+    };
+  },
 
-        return {
-            items: data,
-            pageNumber: Number(response.headers.get("x-pagenumber")),
-            pageSize: Number(response.headers.get("x-pagesize")),
-            totalPages: Number(response.headers.get("x-totalpages")),
-            totalRecords: Number(response.headers.get("x-totalrecords")),
-        };
-    },
+  /**
+   * Obtém um usuário pelo seu ID.
+   */
+  async getUsuarioById(id: string): Promise<UsuarioResponseDto> {
+    const response = await api.get<UsuarioResponseDto>(`/usuarios/${id}`);
+    return response.data;
+  },
 
-    /**
-     * Obtém um usuário pelo seu ID.
-     */
-    async getUsuarioById(id: string): Promise<UsuarioResponseDto> {
-        const response = await fetch(`/api/usuarios/${id}`);
-        if (!response.ok) {
-            throw new Error(`Erro ao obter usuário com id ${id}`);
-        }
+  /**
+   * Busca usuários pelo nome com paginação.
+   */
+  async buscarUsuarios(nome: string, pageNumber: number = 1, pageSize: number = 10): Promise<PaginationResult<UsuarioResponseDto>> {
+    const response = await api.get<UsuarioResponseDto[]>("/usuarios/buscar", {
+      params: { nome, pageNumber, pageSize },
+    });
 
-        return await response.json();
-    },
+    return {
+      items: response.data,
+      pageNumber: Number(response.headers["x-pagenumber"]),
+      pageSize: Number(response.headers["x-pagesize"]),
+      totalPages: Number(response.headers["x-totalpages"]),
+      totalRecords: Number(response.headers["x-totalrecords"]),
+    };
+  },
 
-    /**
-     * Busca usuários pelo nome ou email com paginação.
-     */
-    async buscarUsuarios(
-        termo: string,
-        pageNumber: number = 1,
-        pageSize: number = 10
-    ): Promise<PaginationResult<UsuarioResponseDto>> {
-        const response = await fetch(
-            `/api/usuarios/buscar?termo=${encodeURIComponent(termo)}&pageNumber=${pageNumber}&pageSize=${pageSize}`
-        );
+  /**
+   * Cria um novo usuário.
+   */
+  async criarUsuario(usuario: UsuarioCreateDto): Promise<UsuarioResponseDto> {
+    const response = await api.post<UsuarioResponseDto>("/usuarios/cadastrar", usuario);
+    return response.data;
+  },
 
-        if (!response.ok) {
-            throw new Error("Erro ao buscar usuários");
-        }
+  /**
+   * Atualiza um usuário existente.
+   */
+  async atualizarUsuario(id: string, usuario: UsuarioUpdateDto): Promise<UsuarioResponseDto> {
+    const response = await api.put<UsuarioResponseDto>(`/usuarios/atualizar/${id}`, usuario);
+    return response.data;
+  },
 
-        const data = await response.json();
-
-        return {
-            items: data,
-            pageNumber: Number(response.headers.get("x-pagenumber")),
-            pageSize: Number(response.headers.get("x-pagesize")),
-            totalPages: Number(response.headers.get("x-totalpages")),
-            totalRecords: Number(response.headers.get("x-totalrecords")),
-        };
-    },
-
-    /**
-     * Cria um novo usuário.
-     */
-    async criarUsuario(usuario: UsuarioCreateDto): Promise<UsuarioResponseDto> {
-        const response = await fetch(`/api/usuarios`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(usuario),
-        });
-
-        if (!response.ok) {
-            throw new Error("Erro ao criar usuário");
-        }
-
-        return await response.json();
-    },
-
-    /**
-     * Atualiza um usuário existente.
-     */
-    async atualizarUsuario(id: string, usuario: UsuarioUpdateDto): Promise<UsuarioResponseDto> {
-        const response = await fetch(`/api/usuarios/${id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(usuario),
-        });
-
-        if (!response.ok) {
-            throw new Error(`Erro ao atualizar usuário com id ${id}`);
-        }
-
-        return await response.json();
-    },
-
-    /**
-     * Exclui um usuário pelo ID.
-     */
-    async excluirUsuario(id: string): Promise<void> {
-        const response = await fetch(`/api/usuarios/${id}`, { method: "DELETE" });
-
-        if (!response.ok) {
-            throw new Error(`Erro ao excluir usuário com id ${id}`);
-        }
-    }
+  /**
+   * Exclui um usuário pelo ID.
+   */
+  async excluirUsuario(id: string): Promise<void> {
+  await api.delete(`/usuarios/excluir/${id}`);
+  },
 };

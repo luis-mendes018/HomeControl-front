@@ -18,15 +18,23 @@ export function Header() {
           <Link to="/" className="hover:text-green-200">
             Início
           </Link>
+
+          <Link to="/usuarios" className="hover:text-green-200">
+            Usuários
+          </Link>
+
           <Link to="/categorias" className="hover:text-green-200">
             Categorias
           </Link>
+
           <Link to="/transacoes" className="hover:text-green-200">
             Transações
           </Link>
+
           <Link to="/relatorios" className="hover:text-green-200">
             Relatórios
           </Link>
+          
         </nav>
       </div>
     </header>
