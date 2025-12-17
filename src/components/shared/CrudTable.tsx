@@ -56,7 +56,7 @@ export function CrudTable<T extends { id: string }>({
                 {col.header}
               </th>
             ))}
-            {(onEdit || onDelete) && <th className="p-2 border-b">Opções</th>}
+            {(onEdit || onDelete) && <th className="p-2 border-b"></th>}
           </tr>
         </thead>
         <tbody>

@@ -1,5 +1,6 @@
 import { PaginationResult } from "../types/pagination";
 import { TransacaoCreateDto, TransacaoResponseDto } from "../types/transacao";
+import api from "./axiosConfig";
 
 export const transacaoService = {
     /**
@@ -9,20 +10,20 @@ export const transacaoService = {
      * @param pageSize Quantidade de registros por página (padrão: 10)
      * @returns Objeto PaginationResult com transações e informações de paginação
      */
-    async getAllTransacoes(pageNumber: number = 1, pageSize: number = 10): Promise<PaginationResult<TransacaoResponseDto>> {
-        const response = await fetch(`/api/transacoes?pageNumber=${pageNumber}&pageSize=${pageSize}`);
-        if (!response.ok) {
-            throw new Error("Erro ao obter transações");
-        }
-
-        const data = await response.json();
+    async getAllTransacoes(
+        pageNumber: number = 1,
+        pageSize: number = 10
+    ): Promise<PaginationResult<TransacaoResponseDto>> {
+        const response = await api.get(`/transacoes`, {
+            params: { pageNumber, pageSize },
+        });
 
         return {
-            items: data,
-            pageNumber: Number(response.headers.get("x-pagenumber")),
-            pageSize: Number(response.headers.get("x-pagesize")),
-            totalPages: Number(response.headers.get("x-totalpages")),
-            totalRecords: Number(response.headers.get("x-totalrecords")),
+            items: response.data,
+            pageNumber: Number(response.headers['x-pagenumber']),
+            pageSize: Number(response.headers['x-pagesize']),
+            totalPages: Number(response.headers['x-totalpages']),
+            totalRecords: Number(response.headers['x-totalrecords']),
         };
     },
 
@@ -33,12 +34,8 @@ export const transacaoService = {
      * @returns Transação encontrada
      */
     async getTransacaoById(id: string): Promise<TransacaoResponseDto> {
-        const response = await fetch(`/api/transacoes/${id}`);
-        if (!response.ok) {
-            throw new Error(`Erro ao obter transação com id ${id}`);
-        }
-
-        return await response.json();
+        const response = await api.get(`/transacoes/${id}`);
+        return response.data;
     },
 
     /**
@@ -54,22 +51,16 @@ export const transacaoService = {
         pageNumber: number = 1,
         pageSize: number = 10
     ): Promise<PaginationResult<TransacaoResponseDto>> {
-        const response = await fetch(
-            `/api/transacoes/buscar?filtro=${encodeURIComponent(filtro)}&pageNumber=${pageNumber}&pageSize=${pageSize}`
-        );
-
-        if (!response.ok) {
-            throw new Error("Erro ao buscar transações");
-        }
-
-        const data = await response.json();
+        const response = await api.get(`/transacoes/buscar`, {
+            params: { filtro, pageNumber, pageSize },
+        });
 
         return {
-            items: data,
-            pageNumber: Number(response.headers.get("x-pagenumber")),
-            pageSize: Number(response.headers.get("x-pagesize")),
-            totalPages: Number(response.headers.get("x-totalpages")),
-            totalRecords: Number(response.headers.get("x-totalrecords")),
+            items: response.data,
+            pageNumber: Number(response.headers['x-pagenumber']),
+            pageSize: Number(response.headers['x-pagesize']),
+            totalPages: Number(response.headers['x-totalpages']),
+            totalRecords: Number(response.headers['x-totalrecords']),
         };
     },
 
@@ -80,17 +71,7 @@ export const transacaoService = {
      * @returns A transação criada
      */
     async criarTransacao(dto: TransacaoCreateDto): Promise<TransacaoResponseDto> {
-        const response = await fetch(`/api/transacoes/nova`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(dto),
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText || "Erro ao criar transação");
-        }
-
-        return await response.json();
-    }
+    const response = await api.post(`/transacoes/nova`, dto);
+    return response.data;
+  },
 }

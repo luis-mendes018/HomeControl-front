@@ -1,4 +1,6 @@
+import { CategoriaResponseDto } from "./categoria";
 import { TipoTransacao } from "./TipoTransacao";
+import { UsuarioResponseDto } from "./usuario";
 
 export interface TransacaoCreateDto {
     valor: number;
@@ -10,5 +12,8 @@ export interface TransacaoCreateDto {
 
 export interface TransacaoResponseDto extends TransacaoCreateDto {
     id: string;
-    dataCriacao: string;
+    codigoTransacao: number;
+    categoria: CategoriaResponseDto;
+    usuario: UsuarioResponseDto;
+    dataCriacaoDto: string;
 }
