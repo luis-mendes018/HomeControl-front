@@ -18,7 +18,6 @@ export const categoriaService = {
         pageSize,
       },
     });
-    console.log("HEADERS:", response.headers);
 
     return {
       items: response.data,
@@ -84,7 +83,7 @@ export const categoriaService = {
    * console.log(novaCategoria.id);
    */
   async criarCategoria(dto: CategoriaCreateDto): Promise<CategoriaResponseDto> {
-    const response = await api.post<CategoriaResponseDto>('/categorias', dto);
+    const response = await api.post<CategoriaResponseDto>('/categorias/criar', dto);
     return response.data;
   },
 

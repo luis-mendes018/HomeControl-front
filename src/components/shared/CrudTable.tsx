@@ -20,6 +20,7 @@ interface CrudTableProps<T> {
   onDelete?: (item: T) => void;
 }
 
+
 export function CrudTable<T extends { id: string }>({
   title,
   columns,
